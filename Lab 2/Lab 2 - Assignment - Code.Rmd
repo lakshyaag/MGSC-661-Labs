@@ -1,0 +1,24 @@
+---
+title: "MGSC 661-075 - Lab 2"
+output: html_notebook
+author: "Lakshya Agarwal, Jatin Suri"
+---
+
+# Lab 2
+
+```{r}
+require(visreg)
+require(glue)
+require(car)
+require(lmtest)
+require(psych)
+require(plm)
+```
+
+## Importing data
+
+```{r}
+data <- read.csv("./board_games_fall_2023.csv")
+attach(data)
+head(data)
+```
