@@ -1758,6 +1758,25 @@ display: none;
 <h1>Lab 2</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVxdWlyZSh2aXNyZWcpXG5yZXF1aXJlKGdsdWUpXG5yZXF1aXJlKGNhcilcbnJlcXVpcmUobG10ZXN0KVxucmVxdWlyZShwc3ljaClcbnJlcXVpcmUoc3RhcmdhemVyKVxuYGBgIn0= -->
+<pre class="r"><code>require(visreg)
+require(glue)
+require(car)
+require(lmtest)
+require(psych)
+require(stargazer)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBzdGFyZ2F6ZXJcblxuUGxlYXNlIGNpdGUgYXM6IFxuXG4gSGxhdmFjLCBNYXJlayAoMjAyMikuIHN0YXJnYXplcjogV2VsbC1Gb3JtYXR0ZWQgUmVncmVzc2lvbiBhbmQgU3VtbWFyeSBTdGF0aXN0aWNzIFRhYmxlcy5cbiBSIHBhY2thZ2UgdmVyc2lvbiA1LjIuMy4gaHR0cHM6Ly9DUkFOLlItcHJvamVjdC5vcmcvcGFja2FnZT1zdGFyZ2F6ZXIgXG4ifQ== -->
+<pre><code>Loading required package: stargazer
+
+Please cite as: 
+
+ Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+ R package version 5.2.3. https://CRAN.R-project.org/package=stargazer </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVxdWlyZShwbG0pXG5gYGAifQ== -->
+<pre class="r"><code>require(plm)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="importing-data" class="section level2">
@@ -1774,8 +1793,9 @@ head(data)</code></pre>
 </div>
 <div id="model-issues-non-linearity" class="section level2">
 <h2>1. Model Issues: Non-linearity</h2>
-<div id="avg_rating-bo-b1year-b2avg_timeplayb3weight" class="section level3">
-<h3><code>avg_rating = bo+ b1(year)+ b2(avg_timeplay)+b3(weight)</code></h3>
+<div id="avg_rating-bo-b1year-b2avg_timeplay-b3weight" class="section level4">
+<h4><code>avg_rating = bo+ b1(year)+ b2(avg_timeplay)+ b3(weight)</code></h4>
+</div>
 <div id="part-a" class="section level4">
 <h4>Part A:</h4>
 <!-- rnb-text-end -->
@@ -1789,11 +1809,11 @@ residualPlots(reg1)</code></pre>
 <!-- rnb-text-begin -->
 </div>
 </div>
-</div>
 <div id="model-issues-heteroskedasticity" class="section level2">
 <h2>2. Model Issues: Heteroskedasticity</h2>
-<div id="avg_rating-bo-b1avg_timeplay" class="section level3">
-<h3><code>avg_rating = bo+ b1(avg_timeplay)</code></h3>
+<div id="avg_rating-bo-b1avg_timeplay" class="section level4">
+<h4><code>avg_rating = bo+ b1(avg_timeplay)</code></h4>
+</div>
 <div id="part-b" class="section level4">
 <h4>Part B:</h4>
 <!-- rnb-text-end -->
@@ -1838,11 +1858,11 @@ summary(reg2)</code></pre>
 <!-- rnb-text-begin -->
 </div>
 </div>
-</div>
 <div id="model-issues-outliers" class="section level2">
 <h2>3. Model Issues: Outliers</h2>
-<div id="avg_rating-bo-b1min_players-b2ageb2num_votes" class="section level3">
-<h3><code>avg_rating = bo+ b1(min_players)+ b2(age)+b2(num_votes)</code></h3>
+<div id="avg_rating-bo-b1min_players-b2age-b3num_votes" class="section level4">
+<h4><code>avg_rating = bo+ b1(min_players)+ b2(age)+ b3(num_votes)</code></h4>
+</div>
 <div id="part-a-1" class="section level4">
 <h4>Part A:</h4>
 <!-- rnb-text-end -->
@@ -1879,17 +1899,17 @@ summary(reg4)</code></pre>
 <!-- rnb-text-begin -->
 </div>
 </div>
-</div>
 <div id="model-issues-collinearity" class="section level2">
 <h2>4. Model Issues: Collinearity</h2>
-<div id="avg_rating-bo-b1yearb2ageb3min_timeplayb4max_timeplay" class="section level3">
-<h3><code>avg_rating = bo+ b1(year)+b2(age)+b3(min_timeplay)+b4(max_timeplay)</code></h3>
+<div id="avg_rating-bo-b1year-b2age-b3min_timeplay-b4max_timeplay" class="section level4">
+<h4><code>avg_rating = bo+ b1(year)+ b2(age)+ b3(min_timeplay)+ b4(max_timeplay)</code></h4>
+</div>
 <div id="part-b-2" class="section level4">
 <h4>Part B:</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXVhbnR2YXJzIDwtIGRhdGFbLCBjKDcsOCw5LDEyKV1cbmNvcnJfbWF0cml4IDwtIGNvcihxdWFudHZhcnMpXG5yb3VuZChjb3JyX21hdHJpeCwgMilcbmBgYCJ9 -->
-<pre class="r"><code>quantvars &lt;- data[, c(7,8,9,12)]
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXVhbnR2YXJzIDwtIGRhdGFbLCBjKDcsIDgsIDksIDEyKV1cbmNvcnJfbWF0cml4IDwtIGNvcihxdWFudHZhcnMpXG5yb3VuZChjb3JyX21hdHJpeCwgMilcbmBgYCJ9 -->
+<pre class="r"><code>quantvars &lt;- data[, c(7, 8, 9, 12)]
 corr_matrix &lt;- cor(quantvars)
 round(corr_matrix, 2)</code></pre>
 <!-- rnb-source-end -->
@@ -1900,17 +1920,75 @@ round(corr_matrix, 2)</code></pre>
 <h4>Part D:</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVnNSA8LSBsbShhdmdfcmF0aW5nfnllYXIrYWdlK21pbl90aW1lcGxheSttYXhfdGltZXBsYXkpXG52aWYocmVnNSlcbmBgYCJ9 -->
-<pre class="r"><code>reg5 &lt;- lm(avg_rating~year+age+min_timeplay+max_timeplay)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVnNSA8LSBsbShhdmdfcmF0aW5nIH4geWVhciArIGFnZSArIG1pbl90aW1lcGxheSArIG1heF90aW1lcGxheSlcbnZpZihyZWc1KVxuYGBgIn0= -->
+<pre class="r"><code>reg5 &lt;- lm(avg_rating ~ year + age + min_timeplay + max_timeplay)
 vif(reg5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="presenting-professional-regression-tables" class="section level2">
+<h2>5. Presenting professional regression tables</h2>
+<div id="reg1-avg_rating-bo-b1avg_timeplay" class="section level4">
+<h4><code>reg1: avg_rating = bo+ b1(avg_timeplay)</code></h4>
+</div>
+<div id="reg2-avg_rating-bo-b2min_players" class="section level4">
+<h4><code>reg2: avg_rating = bo+ b2(min_players)</code></h4>
+</div>
+<div id="reg3-avg_rating-bo-b3max_players" class="section level4">
+<h4><code>reg3: avg_rating = bo+ b3(max_players)</code></h4>
+</div>
+<div id="mreg-avg_rating-bo-b1avg_timeplay-b2min_players-b3max_players" class="section level4">
+<h4><code>mreg: avg_rating = bo+ b1(avg_timeplay)+ b2(min_players)+ b3(max_players)</code></h4>
+</div>
+<div id="part-a-2" class="section level4">
+<h4>Part A:</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmVnMSA8LSBsbShhdmdfcmF0aW5nIH4gYXZnX3RpbWVwbGF5KVxucmVnMiA8LSBsbShhdmdfcmF0aW5nIH4gbWluX3BsYXllcnMpXG5yZWczIDwtIGxtKGF2Z19yYXRpbmcgfiBtYXhfcGxheWVycylcbm1yZWcgPC0gbG0oYXZnX3JhdGluZyB+IGF2Z190aW1lcGxheSArIG1pbl9wbGF5ZXJzICsgbWF4X3BsYXllcnMpXG5zdGFyZ2F6ZXIocmVnMSwgcmVnMiwgcmVnMywgbXJlZywgdHlwZT1cImh0bWxcIilcbmBgYCJ9 -->
+<pre class="r"><code>reg1 &lt;- lm(avg_rating ~ avg_timeplay)
+reg2 &lt;- lm(avg_rating ~ min_players)
+reg3 &lt;- lm(avg_rating ~ max_players)
+mreg &lt;- lm(avg_rating ~ avg_timeplay + min_players + max_players)
+stargazer(reg1, reg2, reg3, mreg, type=&quot;html&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="part-b-3" class="section level4">
+<h4>Part B:</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShyZWcyKVxuYGBgIn0= -->
+<pre class="r"><code>summary(reg2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="part-c-2" class="section level4">
+<h4>Part C:</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcmdhemVyKHJlZzEsIHJlZzIsIHJlZzMsIG1yZWcsIHRpdGxlPVwiUmVncmVzc2lvbiBSZXN1bHRzXCIsIHR5cGU9XCJodG1sXCIsIGFsaWduPVRSVUUsIGRlcC52YXIubGFiZWxzPWMoXCJCb2FyZCBHYW1lIFJhdGluZ1wiKSwgY292YXJpYXRlLmxhYmVscz1jKFwiQXZlcmFnZSB0aW1lcGxheVwiLCBcIk1pbmltdW0gbnVtYmVyIG9mIHBsYXllcnNcIiwgXCJNYXhpbXVtIG51bWJlciBvZiBwbGF5ZXJzXCIpKVxuYGBgIn0= -->
+<pre class="r"><code>stargazer(reg1, reg2, reg3, mreg, title=&quot;Regression Results&quot;, type=&quot;html&quot;, align=TRUE, dep.var.labels=c(&quot;Board Game Rating&quot;), covariate.labels=c(&quot;Average timeplay&quot;, &quot;Minimum number of players&quot;, &quot;Maximum number of players&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="part-d-2" class="section level4">
+<h4>Part D:</h4>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RhcmdhemVyKHJlZzEsIHJlZzIsIHJlZzMsIG1yZWcsIHRpdGxlPVwiUmVncmVzc2lvbiBSZXN1bHRzXCIsIHR5cGU9XCJodG1sXCIsIGFsaWduPVRSVUUsIGRlcC52YXIubGFiZWxzPWMoXCJCb2FyZCBHYW1lIFJhdGluZ1wiKSwgY292YXJpYXRlLmxhYmVscz1jKFwiQXZlcmFnZSB0aW1lcGxheVwiLCBcIk1pbmltdW0gbnVtYmVyIG9mIHBsYXllcnNcIiwgXCJNYXhpbXVtIG51bWJlciBvZiBwbGF5ZXJzXCIpLCBkaWdpdHM9MilcbmBgYCJ9 -->
+<pre class="r"><code>stargazer(reg1, reg2, reg3, mreg, title=&quot;Regression Results&quot;, type=&quot;html&quot;, align=TRUE, dep.var.labels=c(&quot;Board Game Rating&quot;), covariate.labels=c(&quot;Average timeplay&quot;, &quot;Minimum number of players&quot;, &quot;Maximum number of players&quot;), digits=2)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 </div>
 </div>
 </div>
-</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiTUdTQyA2NjEtMDc1IC0gTGFiIDIiCm91dHB1dDogaHRtbF9ub3RlYm9vawphdXRob3I6ICJMYWtzaHlhIEFnYXJ3YWwsIEphdGluIFN1cmkiCi0tLQoKIyBMYWIgMgoKYGBge3J9CnJlcXVpcmUodmlzcmVnKQpyZXF1aXJlKGdsdWUpCnJlcXVpcmUoY2FyKQpyZXF1aXJlKGxtdGVzdCkKcmVxdWlyZShwc3ljaCkKcmVxdWlyZShwbG0pCmBgYAoKIyMgSW1wb3J0aW5nIGRhdGEKCmBgYHtyfQpkYXRhIDwtIHJlYWQuY3N2KCIuL2JvYXJkX2dhbWVzX2ZhbGxfMjAyMy5jc3YiKQphdHRhY2goZGF0YSkKaGVhZChkYXRhKQpgYGAKCiMjIDEuIE1vZGVsIElzc3VlczogTm9uLWxpbmVhcml0eQoKIyMjIGBhdmdfcmF0aW5nID0gYm8rIGIxKHllYXIpKyBiMihhdmdfdGltZXBsYXkpK2IzKHdlaWdodClgCgojIyMjIFBhcnQgQToKCmBgYHtyfQpsaWJyYXJ5KGNhcikKcmVnMSA8LSBsbShhdmdfcmF0aW5nIH4geWVhciArIGF2Z190aW1lcGxheSArIHdlaWdodCkKcmVzaWR1YWxQbG90cyhyZWcxKQpgYGAKCiMjIDIuIE1vZGVsIElzc3VlczogSGV0ZXJvc2tlZGFzdGljaXR5CgojIyMgYGF2Z19yYXRpbmcgPSBibysgYjEoYXZnX3RpbWVwbGF5KWAKCiMjIyMgUGFydCBCOgoKYGBge3J9CmxpYnJhcnkoY2FyKQpyZWcyIDwtIGxtKGF2Z19yYXRpbmcgfiBhdmdfdGltZXBsYXkpCnN1bW1hcnkocmVnMikKYGBgCgojIyMjIFBhcnQgQzoKCmBgYHtyfQpyZXNpZHVhbFBsb3QocmVnMiwgcXVhZHJhdGljID0gRkFMU0UpCmBgYAoKIyMjIyBQYXJ0IEQ6CgpgYGB7cn0KbmN2VGVzdChyZWcyKQpgYGAKCiMjIyMgUGFydCBFOgoKYGBge3J9CmNvZWZ0ZXN0KHJlZzIsIHZjb3YgPSB2Y292SEMocmVnMiwgdHlwZSA9ICJIQzEiKSkKc3VtbWFyeShyZWcyKQpgYGAKCiMjIDMuIE1vZGVsIElzc3VlczogT3V0bGllcnMKCiMjIyBgYXZnX3JhdGluZyA9IGJvKyBiMShtaW5fcGxheWVycykrIGIyKGFnZSkrYjIobnVtX3ZvdGVzKWAKCiMjIyMgUGFydCBBOgoKYGBge3J9CnJlZzMgPC0gbG0oYXZnX3JhdGluZyB+IG1pbl9wbGF5ZXJzICsgYWdlICsgbnVtX3ZvdGVzKQpzdW1tYXJ5KHJlZzMpCm91dGxpZXJUZXN0KHJlZzMpCmBgYAoKIyMjIyBQYXJ0IEI6CgpgYGB7cn0KZGF0YVszMTI0LCBdCmBgYAoKIyMjIyBQYXJ0IEM6CgpgYGB7cn0KbmV3X2RhdGEgPC0gZGF0YVstYygzMTI0KSwgXQphdHRhY2gobmV3X2RhdGEpCnJlZzQgPC0gbG0oYXZnX3JhdGluZyB+IG1pbl9wbGF5ZXJzICsgYWdlICsgbnVtX3ZvdGVzKQpzdW1tYXJ5KHJlZzQpCmBgYAoKIyMgNC4gTW9kZWwgSXNzdWVzOiBDb2xsaW5lYXJpdHkKCiMjIyBgYXZnX3JhdGluZyA9IGJvKyBiMSh5ZWFyKStiMihhZ2UpK2IzKG1pbl90aW1lcGxheSkrYjQobWF4X3RpbWVwbGF5KWAKCiMjIyMgUGFydCBCOgoKYGBge3J9CnF1YW50dmFycyA8LSBkYXRhWywgYyg3LDgsOSwxMildCmNvcnJfbWF0cml4IDwtIGNvcihxdWFudHZhcnMpCnJvdW5kKGNvcnJfbWF0cml4LCAyKQpgYGAKCiMjIyMgUGFydCBEOgoKYGBge3J9CnJlZzUgPC0gbG0oYXZnX3JhdGluZ355ZWFyK2FnZSttaW5fdGltZXBsYXkrbWF4X3RpbWVwbGF5KQp2aWYocmVnNSkKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiTUdTQyA2NjEtMDc1IC0gTGFiIDIiCm91dHB1dDogaHRtbF9ub3RlYm9vawphdXRob3I6ICJMYWtzaHlhIEFnYXJ3YWwsIEphdGluIFN1cmkiCi0tLQoKIyBMYWIgMgoKYGBge3J9CnJlcXVpcmUodmlzcmVnKQpyZXF1aXJlKGdsdWUpCnJlcXVpcmUoY2FyKQpyZXF1aXJlKGxtdGVzdCkKcmVxdWlyZShwc3ljaCkKcmVxdWlyZShzdGFyZ2F6ZXIpCnJlcXVpcmUocGxtKQpgYGAKCiMjIEltcG9ydGluZyBkYXRhCgpgYGB7cn0KZGF0YSA8LSByZWFkLmNzdigiLi9ib2FyZF9nYW1lc19mYWxsXzIwMjMuY3N2IikKYXR0YWNoKGRhdGEpCmhlYWQoZGF0YSkKYGBgCgojIyAxLiBNb2RlbCBJc3N1ZXM6IE5vbi1saW5lYXJpdHkKCiMjIyMgYGF2Z19yYXRpbmcgPSBibysgYjEoeWVhcikrIGIyKGF2Z190aW1lcGxheSkrIGIzKHdlaWdodClgCgojIyMjIFBhcnQgQToKCmBgYHtyfQpsaWJyYXJ5KGNhcikKcmVnMSA8LSBsbShhdmdfcmF0aW5nIH4geWVhciArIGF2Z190aW1lcGxheSArIHdlaWdodCkKcmVzaWR1YWxQbG90cyhyZWcxKQpgYGAKCiMjIDIuIE1vZGVsIElzc3VlczogSGV0ZXJvc2tlZGFzdGljaXR5CgojIyMjIGBhdmdfcmF0aW5nID0gYm8rIGIxKGF2Z190aW1lcGxheSlgCgojIyMjIFBhcnQgQjoKCmBgYHtyfQpsaWJyYXJ5KGNhcikKcmVnMiA8LSBsbShhdmdfcmF0aW5nIH4gYXZnX3RpbWVwbGF5KQpzdW1tYXJ5KHJlZzIpCmBgYAoKIyMjIyBQYXJ0IEM6CgpgYGB7cn0KcmVzaWR1YWxQbG90KHJlZzIsIHF1YWRyYXRpYyA9IEZBTFNFKQpgYGAKCiMjIyMgUGFydCBEOgoKYGBge3J9Cm5jdlRlc3QocmVnMikKYGBgCgojIyMjIFBhcnQgRToKCmBgYHtyfQpjb2VmdGVzdChyZWcyLCB2Y292ID0gdmNvdkhDKHJlZzIsIHR5cGUgPSAiSEMxIikpCnN1bW1hcnkocmVnMikKYGBgCgojIyAzLiBNb2RlbCBJc3N1ZXM6IE91dGxpZXJzCgojIyMjIGBhdmdfcmF0aW5nID0gYm8rIGIxKG1pbl9wbGF5ZXJzKSsgYjIoYWdlKSsgYjMobnVtX3ZvdGVzKWAKCiMjIyMgUGFydCBBOgoKYGBge3J9CnJlZzMgPC0gbG0oYXZnX3JhdGluZyB+IG1pbl9wbGF5ZXJzICsgYWdlICsgbnVtX3ZvdGVzKQpzdW1tYXJ5KHJlZzMpCm91dGxpZXJUZXN0KHJlZzMpCmBgYAoKIyMjIyBQYXJ0IEI6CgpgYGB7cn0KZGF0YVszMTI0LCBdCmBgYAoKIyMjIyBQYXJ0IEM6CgpgYGB7cn0KbmV3X2RhdGEgPC0gZGF0YVstYygzMTI0KSwgXQphdHRhY2gobmV3X2RhdGEpCnJlZzQgPC0gbG0oYXZnX3JhdGluZyB+IG1pbl9wbGF5ZXJzICsgYWdlICsgbnVtX3ZvdGVzKQpzdW1tYXJ5KHJlZzQpCmBgYAoKIyMgNC4gTW9kZWwgSXNzdWVzOiBDb2xsaW5lYXJpdHkKCiMjIyMgYGF2Z19yYXRpbmcgPSBibysgYjEoeWVhcikrIGIyKGFnZSkrIGIzKG1pbl90aW1lcGxheSkrIGI0KG1heF90aW1lcGxheSlgCgojIyMjIFBhcnQgQjoKCmBgYHtyfQpxdWFudHZhcnMgPC0gZGF0YVssIGMoNywgOCwgOSwgMTIpXQpjb3JyX21hdHJpeCA8LSBjb3IocXVhbnR2YXJzKQpyb3VuZChjb3JyX21hdHJpeCwgMikKYGBgCgojIyMjIFBhcnQgRDoKCmBgYHtyfQpyZWc1IDwtIGxtKGF2Z19yYXRpbmcgfiB5ZWFyICsgYWdlICsgbWluX3RpbWVwbGF5ICsgbWF4X3RpbWVwbGF5KQp2aWYocmVnNSkKYGBgCgojIyA1LiBQcmVzZW50aW5nIHByb2Zlc3Npb25hbCByZWdyZXNzaW9uIHRhYmxlcwoKIyMjIyBgcmVnMTogYXZnX3JhdGluZyA9IGJvKyBiMShhdmdfdGltZXBsYXkpYAoKIyMjIyBgcmVnMjogYXZnX3JhdGluZyA9IGJvKyBiMihtaW5fcGxheWVycylgCgojIyMjIGByZWczOiBhdmdfcmF0aW5nID0gYm8rIGIzKG1heF9wbGF5ZXJzKWAKCiMjIyMgYG1yZWc6IGF2Z19yYXRpbmcgPSBibysgYjEoYXZnX3RpbWVwbGF5KSsgYjIobWluX3BsYXllcnMpKyBiMyhtYXhfcGxheWVycylgCgojIyMjIFBhcnQgQToKCmBgYHtyfQpyZWcxIDwtIGxtKGF2Z19yYXRpbmcgfiBhdmdfdGltZXBsYXkpCnJlZzIgPC0gbG0oYXZnX3JhdGluZyB+IG1pbl9wbGF5ZXJzKQpyZWczIDwtIGxtKGF2Z19yYXRpbmcgfiBtYXhfcGxheWVycykKbXJlZyA8LSBsbShhdmdfcmF0aW5nIH4gYXZnX3RpbWVwbGF5ICsgbWluX3BsYXllcnMgKyBtYXhfcGxheWVycykKc3RhcmdhemVyKHJlZzEsIHJlZzIsIHJlZzMsIG1yZWcsIHR5cGU9Imh0bWwiKQpgYGAKCiMjIyMgUGFydCBCOgoKYGBge3J9CnN1bW1hcnkocmVnMikKYGBgCgojIyMjIFBhcnQgQzoKCmBgYHtyfQpzdGFyZ2F6ZXIocmVnMSwgcmVnMiwgcmVnMywgbXJlZywgdGl0bGU9IlJlZ3Jlc3Npb24gUmVzdWx0cyIsIHR5cGU9Imh0bWwiLCBhbGlnbj1UUlVFLCBkZXAudmFyLmxhYmVscz1jKCJCb2FyZCBHYW1lIFJhdGluZyIpLCBjb3ZhcmlhdGUubGFiZWxzPWMoIkF2ZXJhZ2UgdGltZXBsYXkiLCAiTWluaW11bSBudW1iZXIgb2YgcGxheWVycyIsICJNYXhpbXVtIG51bWJlciBvZiBwbGF5ZXJzIikpCmBgYAoKIyMjIyBQYXJ0IEQ6CgpgYGB7cn0Kc3RhcmdhemVyKHJlZzEsIHJlZzIsIHJlZzMsIG1yZWcsIHRpdGxlPSJSZWdyZXNzaW9uIFJlc3VsdHMiLCB0eXBlPSJodG1sIiwgYWxpZ249VFJVRSwgZGVwLnZhci5sYWJlbHM9YygiQm9hcmQgR2FtZSBSYXRpbmciKSwgY292YXJpYXRlLmxhYmVscz1jKCJBdmVyYWdlIHRpbWVwbGF5IiwgIk1pbmltdW0gbnVtYmVyIG9mIHBsYXllcnMiLCAiTWF4aW11bSBudW1iZXIgb2YgcGxheWVycyIpLCBkaWdpdHM9MikKYGBgCg==</div>
 
 
 

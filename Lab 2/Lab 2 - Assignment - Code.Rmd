@@ -12,6 +12,7 @@ require(glue)
 require(car)
 require(lmtest)
 require(psych)
+require(stargazer)
 require(plm)
 ```
 
@@ -25,7 +26,7 @@ head(data)
 
 ## 1. Model Issues: Non-linearity
 
-### `avg_rating = bo+ b1(year)+ b2(avg_timeplay)+b3(weight)`
+#### `avg_rating = bo+ b1(year)+ b2(avg_timeplay)+ b3(weight)`
 
 #### Part A:
 
@@ -37,7 +38,7 @@ residualPlots(reg1)
 
 ## 2. Model Issues: Heteroskedasticity
 
-### `avg_rating = bo+ b1(avg_timeplay)`
+#### `avg_rating = bo+ b1(avg_timeplay)`
 
 #### Part B:
 
@@ -68,7 +69,7 @@ summary(reg2)
 
 ## 3. Model Issues: Outliers
 
-### `avg_rating = bo+ b1(min_players)+ b2(age)+b2(num_votes)`
+#### `avg_rating = bo+ b1(min_players)+ b2(age)+ b3(num_votes)`
 
 #### Part A:
 
@@ -95,12 +96,12 @@ summary(reg4)
 
 ## 4. Model Issues: Collinearity
 
-### `avg_rating = bo+ b1(year)+b2(age)+b3(min_timeplay)+b4(max_timeplay)`
+#### `avg_rating = bo+ b1(year)+ b2(age)+ b3(min_timeplay)+ b4(max_timeplay)`
 
 #### Part B:
 
 ```{r}
-quantvars <- data[, c(7,8,9,12)]
+quantvars <- data[, c(7, 8, 9, 12)]
 corr_matrix <- cor(quantvars)
 round(corr_matrix, 2)
 ```
@@ -108,6 +109,44 @@ round(corr_matrix, 2)
 #### Part D:
 
 ```{r}
-reg5 <- lm(avg_rating~year+age+min_timeplay+max_timeplay)
+reg5 <- lm(avg_rating ~ year + age + min_timeplay + max_timeplay)
 vif(reg5)
+```
+
+## 5. Presenting professional regression tables
+
+#### `reg1: avg_rating = bo+ b1(avg_timeplay)`
+
+#### `reg2: avg_rating = bo+ b2(min_players)`
+
+#### `reg3: avg_rating = bo+ b3(max_players)`
+
+#### `mreg: avg_rating = bo+ b1(avg_timeplay)+ b2(min_players)+ b3(max_players)`
+
+#### Part A:
+
+```{r}
+reg1 <- lm(avg_rating ~ avg_timeplay)
+reg2 <- lm(avg_rating ~ min_players)
+reg3 <- lm(avg_rating ~ max_players)
+mreg <- lm(avg_rating ~ avg_timeplay + min_players + max_players)
+stargazer(reg1, reg2, reg3, mreg, type = "html")
+```
+
+#### Part B:
+
+```{r}
+summary(reg2)
+```
+
+#### Part C:
+
+```{r}
+stargazer(reg1, reg2, reg3, mreg, title = "Regression Results", type = "html", align = TRUE, dep.var.labels = c("Board Game Rating"), covariate.labels = c("Average timeplay", "Minimum number of players", "Maximum number of players"))
+```
+
+#### Part D:
+
+```{r}
+stargazer(reg1, reg2, reg3, mreg, title = "Regression Results", type = "html", align = TRUE, dep.var.labels = c("Board Game Rating"), covariate.labels = c("Average timeplay", "Minimum number of players", "Maximum number of players"), digits = 2)
 ```
