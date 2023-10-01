@@ -11,9 +11,12 @@ require(visreg)
 require(glue)
 require(car)
 require(lmtest)
+require(splines)
 require(psych)
 require(stargazer)
 require(plm)
+require(ggplot2)
+require(ggpubr)
 ```
 
 ## Importing data
@@ -31,7 +34,6 @@ head(data)
 #### Part A:
 
 ```{r}
-library(car)
 reg1 <- lm(avg_rating ~ year + avg_timeplay + weight)
 residualPlots(reg1)
 ```
@@ -43,7 +45,6 @@ residualPlots(reg1)
 #### Part B:
 
 ```{r}
-library(car)
 reg2 <- lm(avg_rating ~ avg_timeplay)
 summary(reg2)
 ```
@@ -171,3 +172,175 @@ stargazer(reg1, reg2, reg3, mreg,
           covariate.labels = c("Average timeplay", "Minimum number of players", "Maximum number of players"),
           digits = 2)
 ```
+## 6. Polynomial regression: Age
+
+`avg_rating = f(age)`
+
+#### Part A:
+```{r}
+poly_reg_1 <- lm(avg_rating ~ poly(age, degree = 1))
+poly_reg_2 <- lm(avg_rating ~ poly(age, degree = 2))
+poly_reg_3 <- lm(avg_rating ~ poly(age, degree = 3))
+poly_reg_4 <- lm(avg_rating ~ poly(age, degree = 4))
+
+names(poly_reg_1$coefficients) <- c("Constant", "Age")
+names(poly_reg_2$coefficients) <- c("Constant", "Age", "Age^2")
+names(poly_reg_3$coefficients) <- c("Constant", "Age", "Age^2", "Age^3")
+names(poly_reg_4$coefficients) <- c("Constant", "Age", "Age^2", "Age^3", "Age^4")
+
+stargazer(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4,
+          title = "Regression Results", 
+          type = "html", 
+          align = TRUE, 
+          dep.var.labels = c("Board Game Rating"), 
+          covariate.labels = c("Constant", "Age", "Age<sup>2</sup>", "Age<sup>3</sup>", "Age<sup>4</sup>"),
+          column.labels = c("d=1", "d=2", "d=3", "d=4"),
+          digits = 2)
+```
+#### Part B:
+```{r}
+plot_dn <- function(data, n) {
+  plot <- ggplot(data, aes(x = age, y=avg_rating)) +
+    geom_point(color="grey") +
+    geom_smooth(method = "lm", formula = y ~ poly(x, n), aes(colour=glue("Degree {n}")), se=FALSE) +
+    labs(x = "Age", y = "Average rating", title = glue("Polynomial regression (d={n})"), caption = "Source: Board Game Data") +
+    scale_color_manual(name = "Degree of Fit", values = c("blue")) +
+    theme_classic()
+          
+  return(plot)
+}
+
+plot_d1 <- plot_dn(data, 1)
+plot_d2 <- plot_dn(data, 2)
+plot_d3 <- plot_dn(data, 3)
+plot_d4 <- plot_dn(data, 4)
+
+ggarrange(plot_d1, plot_d2, plot_d3, plot_d4, nrow = 2, ncol = 2, legend = "top", labels = "AUTO")
+
+```
+
+#### Part C:
+```{r}
+anova(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4)
+```
+
+## 7. Polynomial regression: avg_timeplay
+
+`avg_rating = f(avg_timeplay)`
+
+#### Part A:
+```{r}
+poly_reg_1 <- lm(avg_rating ~ poly(avg_timeplay, degree = 1))
+poly_reg_2 <- lm(avg_rating ~ poly(avg_timeplay, degree = 2))
+poly_reg_3 <- lm(avg_rating ~ poly(avg_timeplay, degree = 3))
+poly_reg_4 <- lm(avg_rating ~ poly(avg_timeplay, degree = 4))
+
+names(poly_reg_1$coefficients) <- c("Constant", "X")
+names(poly_reg_2$coefficients) <- c("Constant", "X", "X^2")
+names(poly_reg_3$coefficients) <- c("Constant", "X", "X^2", "X^3")
+names(poly_reg_4$coefficients) <- c("Constant", "X", "X^2", "X^3", "X^4")
+
+
+stargazer(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4,
+          title = "Regression Results (avg\\_rating ~ avg\\_timeplay)", 
+          type = "html", 
+          align = TRUE, 
+          dep.var.labels = c("Board Game Rating"), 
+          covariate.labels = c("Constant", "x", "x<sup>2</sup>", "x<sup>3</sup>", "x<sup>4</sup>"),
+          column.labels = c("d=1", "d=2", "d=3", "d=4"),
+          digits = 2)
+```
+
+#### Part B:
+```{r, fig.width=5, fig.height=7}
+plot_dn <- function(data, n) {
+  plot <- ggplot(data, aes(x = avg_timeplay, y=avg_rating)) +
+    geom_point(color="grey") +
+    geom_smooth(method = "lm", formula = y ~ poly(x, n), aes(colour=glue("Degree {n}")), se=FALSE) +
+    labs(x = "Average Timeplay", y = "Average rating", title = glue("Polynomial regression (d={n})"), caption = "Source: Board Game Data") +
+    scale_color_manual(name = "Degree of Fit", values = c("green")) +
+    theme_classic()
+          
+  return(plot)
+}
+
+plot_d1 <- plot_dn(data, 1)
+plot_d2 <- plot_dn(data, 2)
+plot_d3 <- plot_dn(data, 3)
+plot_d4 <- plot_dn(data, 4)
+
+ggarrange(plot_d1, plot_d2, plot_d3, plot_d4, nrow = 4, ncol = 1, legend = "right")
+```
+
+#### Part C:
+```{r}
+anova(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4)
+```
+
+## 8. Multiple polynomial regression 
+
+`avg_rating = f(age, avg_timeplay)`
+
+#### Part A:
+```{r}
+poly_reg_final <- lm(avg_rating ~ poly(avg_timeplay, 1) + poly(age, 3))
+summary(poly_reg_final)
+```
+
+#### Part B:
+```{r}
+stargazer(poly_reg_final,
+          title = "Regression Results", 
+          type = "html", 
+          align = TRUE, 
+          dep.var.labels = c("Board Game Rating"), 
+          covariate.labels = c("Constant", "Average Timeplay", "Age", "Age<sup>2</sup>", "Age<sup>3</sup>"),
+          digits = 2)
+
+```
+
+## 9. Spline regression
+
+`avg_rating = f(avg_timeplay)`
+
+#### Part B:
+```{r}
+knots = quantile(avg_timeplay)
+spline_reg_1 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 1))
+spline_reg_2 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 2))
+spline_reg_3 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 3))
+
+
+stargazer(spline_reg_1, spline_reg_2, spline_reg_3,
+          title = "Spline Regression Results (avg\\_rating ~ avg\\_timeplay)", 
+          type = "html", 
+          align = TRUE, 
+          dep.var.labels = c("Board Game Rating"),
+          column.labels = c("d=1", "d=2", "d=3"),
+          digits = 2)
+```
+
+#### Part C:
+```{r, fig.width=10, fig.height=7}
+plot_spline_n <- function(data, n) {
+  knots = quantile(avg_timeplay)
+  
+  plot <- ggplot(data, aes(x = avg_timeplay, y = avg_rating)) +
+  geom_point(color = "grey") +
+  geom_smooth(
+    method = "lm",
+    formula = y ~ bs(x, knots = knots, degree = n),
+    se = FALSE,
+    aes(color = glue("Degree {n} - 3 knots"))
+  ) + 
+  geom_vline(xintercept = knots, linetype="dotted") +
+  labs(x = "Average Timeplay", y = "Average Rating", title = glue("Spline regression (d={n})"), caption = "Source: Board Game Data") +
+    scale_color_manual(name = "Degree of Fit", values = c("red")) +
+    theme_classic()
+  
+  return(plot)
+}
+
+ggarrange(plot_spline_n(data, 1), plot_spline_n(data, 2), plot_spline_n(data, 3), ncol = 3, legend = "top")
+```
+
