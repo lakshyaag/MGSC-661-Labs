@@ -17,6 +17,9 @@ require(stargazer)
 require(plm)
 require(ggplot2)
 require(ggpubr)
+require(caTools)
+require(methods)
+require(boot)
 ```
 
 ## Importing data
@@ -178,7 +181,7 @@ stargazer(reg1, reg2, reg3, mreg,
 
 #### Part A:
 ```{r}
-poly_reg_1 <- lm(avg_rating ~ poly(age, degree = 1))
+poly_reg_1 <- lm(avg_rating ~ age)
 poly_reg_2 <- lm(avg_rating ~ poly(age, degree = 2))
 poly_reg_3 <- lm(avg_rating ~ poly(age, degree = 3))
 poly_reg_4 <- lm(avg_rating ~ poly(age, degree = 4))
@@ -202,9 +205,9 @@ stargazer(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4,
 plot_dn <- function(data, n) {
   plot <- ggplot(data, aes(x = age, y=avg_rating)) +
     geom_point(color="grey") +
-    geom_smooth(method = "lm", formula = y ~ poly(x, n), aes(colour=glue("Degree {n}")), se=FALSE) +
+    geom_smooth(method = "lm", formula = if(n == 1) y ~ x else (y ~ poly(x, n)), aes(colour="blue"), se=FALSE) +
     labs(x = "Age", y = "Average rating", title = glue("Polynomial regression (d={n})"), caption = "Source: Board Game Data") +
-    scale_color_manual(name = "Degree of Fit", values = c("blue")) +
+    scale_color_identity(name = "Polynomial", breaks = c("blue"), labels=glue("d-{n}"), guide="legend") +
     theme_classic()
           
   return(plot)
@@ -215,7 +218,7 @@ plot_d2 <- plot_dn(data, 2)
 plot_d3 <- plot_dn(data, 3)
 plot_d4 <- plot_dn(data, 4)
 
-ggarrange(plot_d1, plot_d2, plot_d3, plot_d4, nrow = 2, ncol = 2, legend = "top", labels = "AUTO")
+ggarrange(plot_d1, plot_d2, plot_d3, plot_d4, nrow = 2, ncol = 2, legend = "top")
 
 ```
 
@@ -230,7 +233,7 @@ anova(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4)
 
 #### Part A:
 ```{r}
-poly_reg_1 <- lm(avg_rating ~ poly(avg_timeplay, degree = 1))
+poly_reg_1 <- lm(avg_rating ~ avg_timeplay)
 poly_reg_2 <- lm(avg_rating ~ poly(avg_timeplay, degree = 2))
 poly_reg_3 <- lm(avg_rating ~ poly(avg_timeplay, degree = 3))
 poly_reg_4 <- lm(avg_rating ~ poly(avg_timeplay, degree = 4))
@@ -256,9 +259,9 @@ stargazer(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4,
 plot_dn <- function(data, n) {
   plot <- ggplot(data, aes(x = avg_timeplay, y=avg_rating)) +
     geom_point(color="grey") +
-    geom_smooth(method = "lm", formula = y ~ poly(x, n), aes(colour=glue("Degree {n}")), se=FALSE) +
+    geom_smooth(method = "lm", formula = if(n == 1) y ~ x else (y ~ poly(x, n)), aes(colour="green"), se=FALSE) +
     labs(x = "Average Timeplay", y = "Average rating", title = glue("Polynomial regression (d={n})"), caption = "Source: Board Game Data") +
-    scale_color_manual(name = "Degree of Fit", values = c("green")) +
+    scale_color_identity(name = "Polynomial", breaks = c("green"), labels=glue("d-{n}"), guide="legend") +
     theme_classic()
           
   return(plot)
@@ -283,7 +286,7 @@ anova(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4)
 
 #### Part A:
 ```{r}
-poly_reg_final <- lm(avg_rating ~ poly(avg_timeplay, 1) + poly(age, 3))
+poly_reg_final <- lm(avg_rating ~ avg_timeplay + poly(age, 3))
 summary(poly_reg_final)
 ```
 
@@ -305,7 +308,7 @@ stargazer(poly_reg_final,
 
 #### Part B:
 ```{r}
-knots = quantile(avg_timeplay)
+knots = quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75, 1))
 spline_reg_1 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 1))
 spline_reg_2 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 2))
 spline_reg_3 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 3))
@@ -320,10 +323,11 @@ stargazer(spline_reg_1, spline_reg_2, spline_reg_3,
           digits = 2)
 ```
 
+
 #### Part C:
 ```{r, fig.width=10, fig.height=7}
 plot_spline_n <- function(data, n) {
-  knots = quantile(avg_timeplay)
+  knots = quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75, 1))
   
   plot <- ggplot(data, aes(x = avg_timeplay, y = avg_rating)) +
   geom_point(color = "grey") +
@@ -331,16 +335,187 @@ plot_spline_n <- function(data, n) {
     method = "lm",
     formula = y ~ bs(x, knots = knots, degree = n),
     se = FALSE,
-    aes(color = glue("Degree {n} - 3 knots"))
+    aes(color = "red")
   ) + 
-  geom_vline(xintercept = knots, linetype="dotted") +
+  geom_vline(xintercept = knots, linetype="dotted", linewidth=0.75) +
   labs(x = "Average Timeplay", y = "Average Rating", title = glue("Spline regression (d={n})"), caption = "Source: Board Game Data") +
-    scale_color_manual(name = "Degree of Fit", values = c("red")) +
+    scale_color_identity(name = "Spline", breaks = c("red"), labels=glue("Degree {n} - 3 knots"), guide="legend") +
     theme_classic()
   
   return(plot)
 }
 
 ggarrange(plot_spline_n(data, 1), plot_spline_n(data, 2), plot_spline_n(data, 3), ncol = 3, legend = "top")
+```
+
+## 10. Validation set test
+
+`avg_rating = f(weight)`
+
+### Part A:
+
+```{r}
+sample <- sample.split(data$avg_rating, SplitRatio = 0.5)
+
+train_set <- subset(data, sample == TRUE)
+test_set <- subset(data, sample == FALSE)
+
+validation_mse <- function(degree, num_iter) {
+  fit_dn <-
+    lm(formula = if (degree == 1)
+      avg_rating ~ weight
+      else
+        (avg_rating ~ poly(weight, degree))
+      ,
+      data = train_set)
+  
+  actual = test_set$avg_rating
+  
+  mses = rep(NA, num_iter)
+  
+  for (i in 1:num_iter) {
+    prediction = predict(fit_dn, test_set)
+    squared_error = (actual - prediction) ^ 2
+    mses[i] = mean(squared_error)
+  }
+  
+  mean(mses)
+}
+
+mse_degree = rep(NA, 10)
+
+for (i in 1:10) {
+  mse_degree[i] = validation_mse(i, 30)
+  print(glue("d={i}: {format(mse_degree[i], digits=3)}"))
+}
+
+which.min(mse_degree)
+min(mse_degree)
+```
+
+## 11. LOOCV test
+
+`avg_rating = f(weight)`
+
+### Part B:
+```{r}
+nrow(data)
+```
+
+### Part C:
+```{r}
+loocv_fit_d1 <- glm(formula = avg_rating ~ weight, data = data)
+mse_loocv_fit_d1 <- cv.glm(data=data, loocv_fit_d1)$delta[1]
+
+mse_loocv_fit_d1
+```
+
+### Part D:
+```{r}
+loocv_mse <- function(degree) {
+  loocv_fit_dn <- glm(formula = if (degree == 1)
+    avg_rating ~ weight
+    else
+      (avg_rating ~ poly(weight, degree))
+    ,
+    data = data)
+  mse_loocv_fit_dn <- cv.glm(data = data, loocv_fit_dn)$delta[1]
+  
+  return (mse_loocv_fit_dn)
+}
+
+mse_loocv_list = rep(NA, 10)
+
+for (i in 1:10) {
+  mse_loocv_list[i] = loocv_mse(i)
+  print(glue("d={i}: {format(mse_loocv_list[i], digits = 3)}"))
+}
+
+```
+
+## 12. K-fold cross-validation
+
+`avg_rating = f(num_votes)`
+
+### Part B:
+```{r}
+k_fold_mse <- function(degree, k) {
+  k_fold_fit_dn <- glm(formula = if (degree == 1)
+    avg_rating ~ num_votes
+    else
+      (avg_rating ~ poly(num_votes, degree))
+    ,
+    data = data)
+  
+  mse_k_fold_fit_dn <- cv.glm(data = data, k_fold_fit_dn, K = k)$delta[1]
+  
+  return (mse_k_fold_fit_dn)
+}
+
+mse_k_fold_list <- rep(NA, 10)
+
+for (i in 1:10) {
+  mse_k_fold_list[i] = k_fold_mse(i, 5)
+  print(glue("d={i}: {format(mse_k_fold_list[i], digits = 3)}"))
+}
+
+which.min(mse_k_fold_list)
+min(mse_k_fold_list)
+```
+
+## 13. Cross-validation in a multiple spline model
+
+`avg_rating = f(age,  year,  num_votes, avg_timeplay)`
+
+### Part A:
+```{r}
+knots_age <- quantile(age, probs = c(0.25, 0.50, 0.75))
+knots_year <- quantile(year, probs = c(0.25, 0.50, 0.75))
+knots_num_votes <- quantile(num_votes, probs = c(0.25, 0.50, 0.75))
+knots_avg_timeplay <- quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75))
+
+k_fold_spline <- function(a, b, c, d, k) {
+  fit_model <- glm(
+    formula =
+      avg_rating ~
+      bs(age, knots = knots_age, degree = a) +
+      bs(year, knots = knots_year, degree = b) +
+      bs(num_votes, knots = knots_num_votes, degree = c) +
+      bs(avg_timeplay, knots = knots_avg_timeplay, degree = d)
+  )
+  
+  mse <- cv.glm(data=data, fit_model, K=k)$delta[1]
+  
+  return (mse)
+}
+```
+
+```{r}
+mse_spline_df = data.frame(
+  a = rep(NA, 5 ^ 4),
+  b = rep(NA, 5 ^ 4),
+  c = rep(NA, 5 ^ 4),
+  d = rep(NA, 5 ^ 4),
+  mse = rep(NA, 5 ^ 4)
+)
+
+
+for (a in 1:5) {
+  for (b in 1:5) {
+    for (c in 1:5) {
+      for (d in 1:5) {
+        print(glue("Running 20-fold CV for a,b,c,d = {a},{b},{c},{d}"))
+        
+        mse_spline_df[nrow(mse_spline_df) + 1, ] <-
+          c(a, b, c, d, k_fold_spline(a, b, c, d, 20))
+      }
+    }
+  }
+}
+
+```
+
+```{r}
+mse_spline_df[which.min(mse_spline_df$mse),]
 ```
 
