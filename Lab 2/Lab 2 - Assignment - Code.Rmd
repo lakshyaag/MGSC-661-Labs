@@ -197,17 +197,17 @@ stargazer(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4,
           align = TRUE, 
           dep.var.labels = c("Board Game Rating"), 
           covariate.labels = c("Constant", "Age", "Age<sup>2</sup>", "Age<sup>3</sup>", "Age<sup>4</sup>"),
-          column.labels = c("d=1", "d=2", "d=3", "d=4"),
+          column.labels = c("Linear (d=1)", "Quadratic (d=2)", "Cubic (d=3)", "Quartic (d=4)"),
           digits = 2)
 ```
 #### Part B:
-```{r}
+```{r fig.width=9, fig.height=7}
 plot_dn <- function(data, n) {
   plot <- ggplot(data, aes(x = age, y=avg_rating)) +
     geom_point(color="grey") +
     geom_smooth(method = "lm", formula = if(n == 1) y ~ x else (y ~ poly(x, n)), aes(colour="blue"), se=FALSE) +
     labs(x = "Age", y = "Average rating", title = glue("Polynomial regression (d={n})"), caption = "Source: Board Game Data") +
-    scale_color_identity(name = "Polynomial", breaks = c("blue"), labels=glue("d-{n}"), guide="legend") +
+    scale_color_identity(name = "Degree", breaks = c("blue"), labels=glue("d-{n}"), guide="legend") +
     theme_classic()
           
   return(plot)
@@ -250,18 +250,18 @@ stargazer(poly_reg_1, poly_reg_2, poly_reg_3, poly_reg_4,
           align = TRUE, 
           dep.var.labels = c("Board Game Rating"), 
           covariate.labels = c("Constant", "x", "x<sup>2</sup>", "x<sup>3</sup>", "x<sup>4</sup>"),
-          column.labels = c("d=1", "d=2", "d=3", "d=4"),
+          column.labels = c("Linear (d=1)", "Quadratic (d=2)", "Cubic (d=3)", "Quartic (d=4)"),
           digits = 2)
 ```
 
 #### Part B:
-```{r, fig.width=5, fig.height=7}
+```{r, fig.width=8, fig.height=8}
 plot_dn <- function(data, n) {
   plot <- ggplot(data, aes(x = avg_timeplay, y=avg_rating)) +
     geom_point(color="grey") +
     geom_smooth(method = "lm", formula = if(n == 1) y ~ x else (y ~ poly(x, n)), aes(colour="green"), se=FALSE) +
     labs(x = "Average Timeplay", y = "Average rating", title = glue("Polynomial regression (d={n})"), caption = "Source: Board Game Data") +
-    scale_color_identity(name = "Polynomial", breaks = c("green"), labels=glue("d-{n}"), guide="legend") +
+    scale_color_identity(name = "Degree", breaks = c("green"), labels=glue("d-{n}"), guide="legend") +
     theme_classic()
           
   return(plot)
@@ -297,7 +297,7 @@ stargazer(poly_reg_final,
           type = "html", 
           align = TRUE, 
           dep.var.labels = c("Board Game Rating"), 
-          covariate.labels = c("Constant", "Average Timeplay", "Age", "Age<sup>2</sup>", "Age<sup>3</sup>"),
+          covariate.labels = c("Average Timeplay", "Age", "Age<sup>2</sup>", "Age<sup>3</sup>", "Constant"),
           digits = 2)
 
 ```
@@ -308,7 +308,7 @@ stargazer(poly_reg_final,
 
 #### Part B:
 ```{r}
-knots = quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75, 1))
+knots = quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75))
 spline_reg_1 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 1))
 spline_reg_2 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 2))
 spline_reg_3 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 3))
@@ -317,7 +317,7 @@ spline_reg_3 <- lm(avg_rating ~ bs(avg_timeplay, knots = knots, degree = 3))
 stargazer(spline_reg_1, spline_reg_2, spline_reg_3,
           title = "Spline Regression Results (avg\\_rating ~ avg\\_timeplay)", 
           type = "html", 
-          align = TRUE, 
+          align=TRUE,
           dep.var.labels = c("Board Game Rating"),
           column.labels = c("d=1", "d=2", "d=3"),
           digits = 2)
@@ -327,7 +327,7 @@ stargazer(spline_reg_1, spline_reg_2, spline_reg_3,
 #### Part C:
 ```{r, fig.width=10, fig.height=7}
 plot_spline_n <- function(data, n) {
-  knots = quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75, 1))
+  knots = quantile(avg_timeplay, probs = c(0.25, 0.50, 0.75))
   
   plot <- ggplot(data, aes(x = avg_timeplay, y = avg_rating)) +
   geom_point(color = "grey") +
@@ -335,7 +335,7 @@ plot_spline_n <- function(data, n) {
     method = "lm",
     formula = y ~ bs(x, knots = knots, degree = n),
     se = FALSE,
-    aes(color = "red")
+    aes(color = "red"),
   ) + 
   geom_vline(xintercept = knots, linetype="dotted", linewidth=0.75) +
   labs(x = "Average Timeplay", y = "Average Rating", title = glue("Spline regression (d={n})"), caption = "Source: Board Game Data") +
@@ -491,6 +491,8 @@ k_fold_spline <- function(a, b, c, d, k) {
 ```
 
 ```{r}
+start = Sys.time()
+
 mse_spline_df = data.frame(
   a = rep(NA, 5 ^ 4),
   b = rep(NA, 5 ^ 4),
@@ -512,7 +514,7 @@ for (a in 1:5) {
     }
   }
 }
-
+end = Sys.time()
 ```
 
 ```{r}
