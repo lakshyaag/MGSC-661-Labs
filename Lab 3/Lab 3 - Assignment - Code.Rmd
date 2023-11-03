@@ -1,0 +1,74 @@
+---
+title: "MGSC 661-075 - Lab 3"
+output: html_notebook
+author: "Lakshya Agarwal, Jatin Suri"
+---
+
+# Lab 3
+
+```{r}
+require(car)
+require(ggplot2)
+require(bbplot)
+require(ggtext)
+require(methods)
+require(caTools)
+require(splines)
+require(methods)
+require(boot)
+
+windowsFonts(Helvetica = "Product Sans")
+```
+
+```{r}
+theme_lox <- function() {
+  theme(
+    panel.grid.major.x = element_line(size = 0.3, colour = "#cbcbcb"),
+    panel.grid.major.y = element_line(size = 0.3, colour = "#cbcbcb"),
+    plot.title = element_markdown(
+      family = "Helvetica",
+      size = 22,
+      face = "bold",
+      color = "#222222"
+    ),
+    plot.subtitle = element_text(
+      family = "Helvetica",
+      size = 16,
+      margin = margin(2, 0, 2, 0)
+    ),
+    plot.caption = element_text(family = "Helvetica", face = "bold"),
+    axis.text = element_text(
+      family = "Helvetica",
+      size = 12,
+      color = "#222222"
+    ),
+    axis.title = element_text(
+      family = "Helvetica",
+      size = 14,
+      color = "#222222"
+    ),
+    legend.text = element_text(family = "Helvetica", size = 12),
+    legend.title = element_text(
+      family = "Helvetica",
+      size = 14,
+      face = "bold"
+    ),
+    legend.position = "right",
+    strip.text = element_text(
+      family = "Helvetica",
+      size = 12,
+      hjust = 0.5
+    )
+  )
+}
+```
+```
+
+## Importing data
+
+```{r}
+election_data <- read.csv("./election_data.csv")
+wine_data <- read.csv("./wine_data.csv")
+attach(election_data)
+attach(wine_data)
+```
