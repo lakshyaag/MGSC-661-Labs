@@ -16,6 +16,7 @@ require(caTools)
 require(splines)
 require(methods)
 require(boot)
+require(stargazer)
 
 windowsFonts(Helvetica = "Product Sans")
 ```
@@ -62,7 +63,6 @@ theme_lox <- function() {
   )
 }
 ```
-```
 
 ## Importing data
 
@@ -71,4 +71,94 @@ election_data <- read.csv("./election_data.csv")
 wine_data <- read.csv("./wine_data.csv")
 attach(election_data)
 attach(wine_data)
+```
+## 1. The linear probability model
+
+#### Part A:
+
+```{r}
+election_data$winner <- as.numeric(election_data$winner == "Trump")
+reg1 <- lm(winner ~ pop2014 + under18 + density + black + hispanic, data = election_data)
+stargazer(
+  reg1,
+  title = "Linear Regression Results",
+  type = "html",
+  align = TRUE,
+  dep.var.labels = c("Winner"),
+  covariate.labels = c("Total Population (in 2014)", "Under 18 Population", "Population Density", "Black Population", "Hispanic Population")
+)
+```
+
+#### Part C:
+
+```{r}
+predict_data_1 <- data.frame(
+  pop2014 = 250000,
+  under18 = 10 / 100, # Convert percentages to proportions for the model
+  density = 175,
+  black = 45 / 100,
+  hispanic = 10 / 100
+)
+predicted_prob_1 <- predict(reg1, newdata = predict_data_1)
+print(predicted_prob_1)
+```
+
+#### Part D:
+
+```{r}
+predict_data_2 <- data.frame(
+  pop2014 = 1000000,
+  under18 = 20 / 100, # Convert percentages to proportions for the model
+  density = 1000,
+  black = 85 / 100,
+  hispanic = 5 / 100
+)
+predicted_prob_2 <- predict(reg1, newdata = predict_data_2)
+print(predicted_prob_2)
+```
+
+## 2. Logistic Regression
+
+#### Part A:
+
+```{r}
+reg2 <- glm(formula = winner ~ pop2014 + under18 + density + black + hispanic, data = election_data, family = "binomial")
+stargazer(
+  reg2,
+  title = "Logistic Regression Results",
+  type = "html",
+  align = TRUE,
+  dep.var.labels = c("Winner"),
+  covariate.labels = c("Total Population (in 2014)", "Under 18 Population", "Population Density", "Black Population", "Hispanic Population")
+)
+```
+
+#### Part B:
+
+```{r}
+summary(reg2)
+```
+
+#### Part C:
+
+```{r}
+prob_1 <- data.frame(pop2014 = 1000000, under18 = 20 / 100, density = 1000, black = 85 / 100, hispanic = 5 / 100)
+predict(reg2, prob_1, type = "response")
+```
+
+#### Part E:
+
+```{r}
+b0 <- coef(reg2)[1]
+b1 <- coef(reg2)[2]
+b2 <- coef(reg2)[3]
+b3 <- coef(reg2)[4]
+b4 <- coef(reg2)[5]
+b5 <- coef(reg2)[6]
+pop2014_value <- 250000
+under18_value <- 25 / 100
+density_value <- 100
+hispanic_value <- 10 / 100
+black_threshold <- -(b0 + b1 * pop2014_value + b2 * under18_value + b3 * density_value + b5 * hispanic_value) / b4
+print(black_threshold)
 ```
