@@ -17,6 +17,8 @@ require(splines)
 require(methods)
 require(boot)
 require(stargazer)
+require(MASS)
+require(klaR)
 
 windowsFonts(Helvetica = "Product Sans")
 ```
@@ -72,6 +74,7 @@ wine_data <- read.csv("./wine_data.csv")
 attach(election_data)
 attach(wine_data)
 ```
+
 ## 1. The linear probability model
 
 #### Part A:
@@ -161,4 +164,65 @@ density_value <- 100
 hispanic_value <- 10 / 100
 black_threshold <- -(b0 + b1 * pop2014_value + b2 * under18_value + b3 * density_value + b5 * hispanic_value) / b4
 print(black_threshold)
+```
+
+#### Part F:
+
+```{r}
+reg3 <- glm(formula = winner ~ hispanic + undergrad, data = election_data, family = "binomial")
+```
+
+## 3. **Linear discriminant analysis with two predictors**
+
+#### Part A:
+
+```{r}
+table(wine_data$cultivar)
+```
+
+#### Part B:
+
+```{r}
+range_alcohol <- range(wine_data$alcohol)
+
+par(mfrow = c(1, 3))
+
+hist(wine_data$alcohol[wine_data$cultivar == 1], breaks = 20, xlim = range_alcohol, main = "Alcohol lvl Cultivar-1", xlab = "Alcohol", ylab = "Frequency", col = "blue")
+
+hist(wine_data$alcohol[wine_data$cultivar == 2], breaks = 20, xlim = range_alcohol, main = "Alcohol lvl Cultivar-2", xlab = "Alcohol", ylab = "Frequency", col = "red")
+
+hist(wine_data$alcohol[wine_data$cultivar == 3], breaks = 20, xlim = range_alcohol, main = "Alcohol lvl Cultivar-3", xlab = "Alcohol", ylab = "Frequency", col = "green")
+```
+
+#### Part C:
+
+```{r}
+range_acid <- range(wine_data$acid)
+
+par(mfrow = c(1, 3))
+
+hist(wine_data$acid[wine_data$cultivar == 1], breaks = 20, xlim = range_acid, main = "Acid lvl Cultivar-1", xlab = "Acid", ylab = "Frequency", col = "blue")
+
+hist(wine_data$acid[wine_data$cultivar == 2], breaks = 20, xlim = range_acid, main = "Acid lvl Cultivar-2", xlab = "Acid", ylab = "Frequency", col = "red")
+
+hist(wine_data$acid[wine_data$cultivar == 3], breaks = 20, xlim = range_acid, main = "Acid lvl Cultivar-3", xlab = "Acid", ylab = "Frequency", col = "green")
+```
+
+#### Part E:
+
+```{r}
+lda1 <- lda(wine_data$cultivar ~ wine_data$alcohol + wine_data$acid, data = wine_data)
+lda1
+```
+
+#### Part F:
+
+```{r}
+partimat(cultivar ~ alcohol + acid, data = wine_data, method = "lda", image.colors = c("lightgrey", "lightgreen", "white"))
+```
+
+#### Part I:
+
+```{r}
+predict(lda1, data.frame(alcohol = 14, acid = 3))
 ```
