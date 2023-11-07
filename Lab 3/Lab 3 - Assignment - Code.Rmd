@@ -19,6 +19,8 @@ require(boot)
 require(stargazer)
 require(MASS)
 require(klaR)
+require(scales)
+require(glue)
 
 windowsFonts(Helvetica = "Product Sans")
 ```
@@ -80,15 +82,27 @@ attach(wine_data)
 #### Part A:
 
 ```{r}
-election_data$winner <- as.numeric(election_data$winner == "Trump")
-reg1 <- lm(winner ~ pop2014 + under18 + density + black + hispanic, data = election_data)
+election_data$winner_code <-
+  as.numeric(election_data$winner == "Trump")
+reg1 <-
+  lm(winner_code ~ pop2014 + under18 + density + black + hispanic, data = election_data)
+
+summary(reg1)
+
 stargazer(
   reg1,
   title = "Linear Regression Results",
   type = "html",
   align = TRUE,
+  digits = 2,
   dep.var.labels = c("Winner"),
-  covariate.labels = c("Total Population (in 2014)", "Under 18 Population", "Population Density", "Black Population", "Hispanic Population")
+  covariate.labels = c(
+    "Total Population (in 2014)",
+    "Under 18 Population",
+    "Population Density",
+    "Black Population",
+    "Hispanic Population"
+  )
 )
 ```
 
@@ -125,14 +139,27 @@ print(predicted_prob_2)
 #### Part A:
 
 ```{r}
-reg2 <- glm(formula = winner ~ pop2014 + under18 + density + black + hispanic, data = election_data, family = "binomial")
+reg2 <-
+  glm(
+    formula = winner_code ~ pop2014 + under18 + density + black + hispanic,
+    data = election_data,
+    family = "binomial"
+  )
+summary(reg2)
 stargazer(
   reg2,
   title = "Logistic Regression Results",
   type = "html",
   align = TRUE,
+  digits = 2,
   dep.var.labels = c("Winner"),
-  covariate.labels = c("Total Population (in 2014)", "Under 18 Population", "Population Density", "Black Population", "Hispanic Population")
+  covariate.labels = c(
+    "Total Population (in 2014)",
+    "Under 18 Population",
+    "Population Density",
+    "Black Population",
+    "Hispanic Population"
+  )
 )
 ```
 
@@ -145,7 +172,14 @@ summary(reg2)
 #### Part C:
 
 ```{r}
-prob_1 <- data.frame(pop2014 = 1000000, under18 = 20 / 100, density = 1000, black = 85 / 100, hispanic = 5 / 100)
+prob_1 <-
+  data.frame(
+    pop2014 = 1000000,
+    under18 = 20 / 100,
+    density = 1000,
+    black = 85 / 100,
+    hispanic = 5 / 100
+  )
 predict(reg2, prob_1, type = "response")
 ```
 
@@ -169,56 +203,64 @@ print(black_threshold)
 #### Part F:
 
 ```{r}
-reg3 <- glm(formula = winner ~ hispanic + undergrad, data = election_data, family = "binomial")
+reg3 <- glm(formula = winner_code ~ hispanic + undergrad, data = election_data, family = "binomial")
+
+summary(reg3)
 ```
 
-## 3. **Linear discriminant analysis with two predictors**
+## 3. Linear discriminant analysis
+
+```{r}
+wine_data$cultivar <- as.factor(wine_data$cultivar)
+```
+
 
 #### Part A:
 
 ```{r}
-table(wine_data$cultivar)
+table(wine_data$cultivar)/nrow(wine_data)
 ```
 
 #### Part B:
 
 ```{r}
-range_alcohol <- range(wine_data$alcohol)
-
-par(mfrow = c(1, 3))
-
-hist(wine_data$alcohol[wine_data$cultivar == 1], breaks = 20, xlim = range_alcohol, main = "Alcohol lvl Cultivar-1", xlab = "Alcohol", ylab = "Frequency", col = "blue")
-
-hist(wine_data$alcohol[wine_data$cultivar == 2], breaks = 20, xlim = range_alcohol, main = "Alcohol lvl Cultivar-2", xlab = "Alcohol", ylab = "Frequency", col = "red")
-
-hist(wine_data$alcohol[wine_data$cultivar == 3], breaks = 20, xlim = range_alcohol, main = "Alcohol lvl Cultivar-3", xlab = "Alcohol", ylab = "Frequency", col = "green")
+ggplot(wine_data, aes(x = alcohol)) +
+  geom_histogram(aes(fill = cultivar)) +
+  facet_grid(cols = vars(cultivar),
+             labeller = labeller(cultivar = label_both)) +
+  labs(x = "Alcohol", y = "Frequency") +
+  scale_x_continuous(breaks = breaks_pretty()) +
+  guides(fill = "none")
 ```
 
 #### Part C:
 
 ```{r}
-range_acid <- range(wine_data$acid)
-
-par(mfrow = c(1, 3))
-
-hist(wine_data$acid[wine_data$cultivar == 1], breaks = 20, xlim = range_acid, main = "Acid lvl Cultivar-1", xlab = "Acid", ylab = "Frequency", col = "blue")
-
-hist(wine_data$acid[wine_data$cultivar == 2], breaks = 20, xlim = range_acid, main = "Acid lvl Cultivar-2", xlab = "Acid", ylab = "Frequency", col = "red")
-
-hist(wine_data$acid[wine_data$cultivar == 3], breaks = 20, xlim = range_acid, main = "Acid lvl Cultivar-3", xlab = "Acid", ylab = "Frequency", col = "green")
+ggplot(wine_data, aes(x = acid)) +
+  geom_histogram(aes(fill = cultivar)) +
+  facet_grid(cols = vars(cultivar),
+             labeller = labeller(cultivar = label_both)) +
+  labs(x = "Acid", y = "Frequency") +
+  scale_x_continuous(breaks = breaks_pretty()) +
+  guides(fill = "none")
 ```
 
 #### Part E:
 
 ```{r}
-lda1 <- lda(wine_data$cultivar ~ wine_data$alcohol + wine_data$acid, data = wine_data)
+lda1 <- lda(cultivar ~ alcohol + acid, data = wine_data)
 lda1
 ```
 
 #### Part F:
 
 ```{r}
-partimat(cultivar ~ alcohol + acid, data = wine_data, method = "lda", image.colors = c("lightgrey", "lightgreen", "white"))
+partimat(
+  cultivar ~ alcohol + acid,
+  data = wine_data,
+  method = "lda",
+  image.colors = c("lightgrey", "lightgreen", "white")
+)
 ```
 
 #### Part I:
@@ -226,3 +268,51 @@ partimat(cultivar ~ alcohol + acid, data = wine_data, method = "lda", image.colo
 ```{r}
 predict(lda1, data.frame(alcohol = 14, acid = 3))
 ```
+
+## 4. Quadratic discriminant analysis
+
+#### Part B:
+```{r}
+qda <- qda(cultivar ~ alcohol + acid, data = wine_data)
+qda
+```
+
+#### Part C:
+```{r}
+partimat(
+  cultivar ~ alcohol + acid,
+  data = wine_data,
+  method = "qda",
+  image.colors = c("lightgrey", "lightgreen", "white")
+)
+```
+
+## 5. Cross-validation
+
+```{r}
+  set.seed(420)
+  sample = sample.split(wine_data$cultivar, SplitRatio = 0.6)
+  train_set = subset(wine_data, sample == TRUE)
+  test_set = subset(wine_data, sample == FALSE)
+```
+
+#### LDA
+```{r}
+lda_model <- lda(cultivar ~ alcohol + acid, data = train_set)
+lda_predictions <-
+  predict(lda_model, newdata = test_set)$class
+
+lda_accuracy <- sum(lda_predictions == test_set$cultivar) / length(lda_predictions)
+print(glue("Accuracy of LDA: {round(lda_accuracy, 3)}"))
+```
+
+#### QDA
+```{r}
+qda_model <- qda(cultivar ~ alcohol + acid, data = train_set)
+qda_predictions <-
+    predict(qda_model, newdata = test_set)$class
+
+qda_accuracy <- sum(qda_predictions == test_set$cultivar) / length(qda_predictions)
+print(glue("Accuracy of QDA: {round(qda_accuracy, 3)}"))
+```
+
