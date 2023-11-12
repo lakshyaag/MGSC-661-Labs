@@ -203,10 +203,47 @@ print(black_threshold)
 #### Part F:
 
 ```{r}
-reg3 <- glm(formula = winner_code ~ hispanic + undergrad, data = election_data, family = "binomial")
+b0 <- -0.75
+b1 <- 0.03
+b2 <- 0.01
 
-summary(reg3)
+p_x <- function(b0, b1, b2, hispanic, undergrad) {
+  return (1 / (1 + exp(b0 + b1 * hispanic + b2 * undergrad)))
+}
+
+obs_1 <- p_x(b0, b1, b2, 0.15, 0.20)
+obs_2 <- p_x(b0, b1, b2, 0.25, 0.55)
+obs_3 <- p_x(b0, b1, b2, 0.05, 0.05)
+obs_4 <- p_x(b0, b1, b2, 0.75, 0.10)
+
+print(c(obs_1, obs_2, obs_3, obs_4))
+
+likelihood = (obs_1 * obs_3) * ((1 - obs_2) * (1 - obs_4))
+likelihood
 ```
+
+#### Part G:
+
+```{r}
+b0 <- -1
+b1 <- 2
+b2 <- 4
+
+p_x <- function(b0, b1, b2, hispanic, undergrad) {
+  return (1 / (1 + exp(b0 + b1 * hispanic + b2 * undergrad)))
+}
+
+obs_1 <- p_x(b0, b1, b2, 0.15, 0.20)
+obs_2 <- p_x(b0, b1, b2, 0.25, 0.55)
+obs_3 <- p_x(b0, b1, b2, 0.05, 0.05)
+obs_4 <- p_x(b0, b1, b2, 0.75, 0.10)
+
+print(c(obs_1, obs_2, obs_3, obs_4))
+
+likelihood = (obs_1 * obs_3) * ((1 - obs_2) * (1 - obs_4))
+likelihood
+```
+
 
 ## 3. Linear discriminant analysis
 
