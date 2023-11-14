@@ -21,6 +21,7 @@ require(MASS)
 require(klaR)
 require(scales)
 require(glue)
+require(rms)
 
 windowsFonts(Helvetica = "Product Sans")
 ```
@@ -183,6 +184,13 @@ prob_1 <-
 predict(reg2, prob_1, type = "response")
 ```
 
+#### Part D:
+
+```{r}
+mlogit <- lrm(winner_code ~ pop2014 + under18 + density + black + hispanic, data = election_data)
+mlogit
+```
+
 #### Part E:
 
 ```{r}
@@ -244,13 +252,11 @@ likelihood = (obs_1 * obs_3) * ((1 - obs_2) * (1 - obs_4))
 likelihood
 ```
 
-
 ## 3. Linear discriminant analysis
 
 ```{r}
 wine_data$cultivar <- as.factor(wine_data$cultivar)
 ```
-
 
 #### Part A:
 
@@ -309,12 +315,14 @@ predict(lda1, data.frame(alcohol = 14, acid = 3))
 ## 4. Quadratic discriminant analysis
 
 #### Part B:
+
 ```{r}
 qda <- qda(cultivar ~ alcohol + acid, data = wine_data)
 qda
 ```
 
 #### Part C:
+
 ```{r}
 partimat(
   cultivar ~ alcohol + acid,
@@ -334,6 +342,7 @@ partimat(
 ```
 
 #### LDA
+
 ```{r}
 lda_model <- lda(cultivar ~ alcohol + acid, data = train_set)
 lda_predictions <-
@@ -344,6 +353,7 @@ print(glue("Accuracy of LDA: {round(lda_accuracy, 3)}"))
 ```
 
 #### QDA
+
 ```{r}
 qda_model <- qda(cultivar ~ alcohol + acid, data = train_set)
 qda_predictions <-
@@ -352,4 +362,3 @@ qda_predictions <-
 qda_accuracy <- sum(qda_predictions == test_set$cultivar) / length(qda_predictions)
 print(glue("Accuracy of QDA: {round(qda_accuracy, 3)}"))
 ```
-
