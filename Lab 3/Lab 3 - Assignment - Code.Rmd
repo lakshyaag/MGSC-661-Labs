@@ -216,7 +216,8 @@ b1 <- 0.03
 b2 <- 0.01
 
 p_x <- function(b0, b1, b2, hispanic, undergrad) {
-  return (1 / (1 + exp(b0 + b1 * hispanic + b2 * undergrad)))
+  odds <- exp(b0 + b1 * hispanic + b2 * undergrad)
+  return (odds / (1 + odds))
 }
 
 obs_1 <- p_x(b0, b1, b2, 0.15, 0.20)
@@ -238,7 +239,8 @@ b1 <- 2
 b2 <- 4
 
 p_x <- function(b0, b1, b2, hispanic, undergrad) {
-  return (1 / (1 + exp(b0 + b1 * hispanic + b2 * undergrad)))
+  odds <- exp(b0 + b1 * hispanic + b2 * undergrad)
+  return (odds / (1 + odds))
 }
 
 obs_1 <- p_x(b0, b1, b2, 0.15, 0.20)

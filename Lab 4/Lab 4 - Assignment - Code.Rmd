@@ -1,0 +1,168 @@
+---
+title: "MGSC 661-075 - Lab 4"
+output: html_notebook
+author: "Lakshya Agarwal, Jatin Suri"
+---
+
+# Lab 4
+
+```{r}
+require(car)
+require(ggplot2)
+require(bbplot)
+require(ggtext)
+require(methods)
+require(caTools)
+require(splines)
+require(methods)
+require(boot)
+require(stargazer)
+require(MASS)
+require(klaR)
+require(scales)
+require(glue)
+require(rms)
+require(tree)
+require(rpart)
+require(rpart.plot)
+require(randomForest)
+require(gbm)
+require(GGally)
+require(ggfortify)
+
+windowsFonts(Helvetica = "Product Sans")
+```
+
+```{r}
+theme_lox <- function() {
+  theme(
+    panel.grid.major.x = element_line(size = 0.3, colour = "#cbcbcb"),
+    panel.grid.major.y = element_line(size = 0.3, colour = "#cbcbcb"),
+    plot.title = element_markdown(
+      family = "Helvetica",
+      size = 22,
+      face = "bold",
+      color = "#222222"
+    ),
+    plot.subtitle = element_text(
+      family = "Helvetica",
+      size = 16,
+      margin = margin(2, 0, 2, 0)
+    ),
+    plot.caption = element_text(family = "Helvetica", face = "bold"),
+    axis.text = element_text(
+      family = "Helvetica",
+      size = 12,
+      color = "#222222"
+    ),
+    axis.title = element_text(
+      family = "Helvetica",
+      size = 14,
+      color = "#222222"
+    ),
+    legend.text = element_text(family = "Helvetica", size = 12),
+    legend.title = element_text(
+      family = "Helvetica",
+      size = 14,
+      face = "bold"
+    ),
+    legend.position = "right",
+    strip.text = element_text(
+      family = "Helvetica",
+      size = 12,
+      hjust = 0.5
+    )
+  )
+}
+```
+
+## Importing data
+
+```{r}
+diabetes_data <- read.csv("./diabetes - Copy.csv")
+animal_shelter_data <- read.csv("./animal_shelter - Copy.csv")
+animal_shelter_data$outcome = as.factor(animal_shelter_data$outcome)
+attach(diabetes_data)
+attach(animal_shelter_data)
+```
+
+## 1. Interpreting a classification tree
+
+### Part C
+```{r}
+obs <- data.frame(x1 = c(8,4,4,2), x2=c(4,3,2,2), y=c(20,2,2,3))
+obs
+```
+
+## 2. Growing a tree (outcome=f(age, number_animals_in_shelter, animal_type, is_sterilized, sex))
+
+### Part A
+```{r}
+plot_tree <- function(cp) {
+  tree <-
+    rpart(
+      outcome ~ age + number_animals_in_shelter + animal_type + is_sterilized + sex,
+      data = animal_shelter_data,
+      control = rpart.control(cp = cp)
+    )
+  
+  rpart.plot(tree)
+  
+  return(tree)
+}
+
+tree_1 <- plot_tree(0.5)
+tree_2 <- plot_tree(0.05)
+tree_3 <- plot_tree(0.0005)
+```
+
+### Part C
+```{r}
+plotcp(tree_3)
+```
+
+### Part D
+```{r}
+optimal_cp <- tree_3$cptable[which.min(tree_3$cptable[, "xerror"]), "CP"]
+
+optimal_cp
+```
+### Part E
+```{r}
+optimal_tree <- plot_tree(optimal_cp)
+
+```
+
+## 3. Growing a random forest
+
+### Part F (outcome=f(age, number_animals_in_shelter, animal_type, is_sterilized, sex))
+```{r}
+rf <- randomForest(
+  outcome ~ age + number_animals_in_shelter + animal_type + is_sterilized + sex,
+  data = animal_shelter_data,
+  ntree=1000, 
+  importance=TRUE,
+  na.action = na.omit
+)
+
+rf
+```
+
+### Part G
+```{r}
+rf_oob <- randomForest(
+  outcome ~ age + number_animals_in_shelter + animal_type + is_sterilized + sex,
+  data = animal_shelter_data,
+  ntree=1000, 
+  importance=TRUE,
+  do.trace=100,
+  na.action = na.omit
+)
+
+rf_oob
+```
+### Part I
+```{r}
+varImpPlot(rf_oob)
+```
+
