@@ -81,10 +81,10 @@ theme_lox <- function() {
 ```{r}
 diabetes_data <- read.csv("./diabetes - Copy.csv")
 animal_shelter_data <- read.csv("./animal_shelter - Copy.csv")
-animal_shelter_data$outcome = as.factor(animal_shelter_data$outcome)
-animal_shelter_data$animal_type = as.factor(animal_shelter_data$animal_type)
-animal_shelter_data$is_sterilized = as.factor(animal_shelter_data$is_sterilized)
-animal_shelter_data$sex = as.factor(animal_shelter_data$sex)
+animal_shelter_data$outcome <- as.factor(animal_shelter_data$outcome)
+animal_shelter_data$animal_type <- as.factor(animal_shelter_data$animal_type)
+animal_shelter_data$is_sterilized <- as.factor(animal_shelter_data$is_sterilized)
+animal_shelter_data$sex <- as.factor(animal_shelter_data$sex)
 attach(diabetes_data)
 attach(animal_shelter_data)
 ```
@@ -92,14 +92,16 @@ attach(animal_shelter_data)
 ## 1. Interpreting a classification tree
 
 ### Part C
+
 ```{r}
-obs <- data.frame(x1 = c(8,4,4,2), x2=c(4,3,2,2), y=c(20,2,2,3))
+obs <- data.frame(x1 = c(8, 4, 4, 2), x2 = c(4, 3, 2, 2), y = c(20, 2, 2, 3))
 obs
 ```
 
 ## 2. Growing a tree (outcome=f(age, number_animals_in_shelter, animal_type, is_sterilized, sex))
 
 ### Part A
+
 ```{r}
 plot_tree <- function(cp) {
   tree <-
@@ -108,9 +110,9 @@ plot_tree <- function(cp) {
       data = animal_shelter_data,
       control = rpart.control(cp = cp)
     )
-  
+
   rpart.plot(tree)
-  
+
   return(tree)
 }
 
@@ -120,31 +122,35 @@ tree_3 <- plot_tree(0.0005)
 ```
 
 ### Part C
+
 ```{r}
 plotcp(tree_3)
 ```
 
 ### Part D
+
 ```{r}
 optimal_cp <- tree_3$cptable[which.min(tree_3$cptable[, "xerror"]), "CP"]
 
 optimal_cp
 ```
+
 ### Part E
+
 ```{r}
 optimal_tree <- plot_tree(optimal_cp)
-
 ```
 
 ## 3. Growing a random forest
 
 ### Part F (outcome=f(age, number_animals_in_shelter, animal_type, is_sterilized, sex))
+
 ```{r}
 rf <- randomForest(
   outcome ~ age + number_animals_in_shelter + animal_type + is_sterilized + sex,
   data = animal_shelter_data,
-  ntree=1000, 
-  importance=TRUE,
+  ntree = 1000,
+  importance = TRUE,
   na.action = na.omit
 )
 
@@ -152,19 +158,22 @@ rf
 ```
 
 ### Part G
+
 ```{r}
 rf_oob <- randomForest(
   outcome ~ age + number_animals_in_shelter + animal_type + is_sterilized + sex,
   data = animal_shelter_data,
-  ntree=1000, 
-  importance=TRUE,
-  do.trace=100,
+  ntree = 1000,
+  importance = TRUE,
+  do.trace = 100,
   na.action = na.omit
 )
 
 rf_oob
 ```
+
 ### Part I
+
 ```{r}
 varImpPlot(rf_oob)
 ```
@@ -175,20 +184,21 @@ varImpPlot(rf_oob)
 
 ```{r}
 set.seed(420)
-animal_shelter_data$outcome_category = ifelse(animal_shelter_data$outcome == "Adopted", 1, 0)
+animal_shelter_data$outcome_category <- ifelse(animal_shelter_data$outcome == "Adopted", 1, 0)
 boosted_tree <- gbm(
   outcome_category ~ age + number_animals_in_shelter + animal_type + is_sterilized + sex,
-  data=animal_shelter_data,
-  distribution = 'bernoulli',
+  data = animal_shelter_data,
+  distribution = "bernoulli",
   n.trees = 1000,
   interaction.depth = 3
 )
 
 summary(boosted_tree)
 ```
+
 ```{r}
-adoption_probs <- predict(boosted_tree, newdata = animal_shelter_data, type="response")
-animal_shelter_data$predicted = ifelse(adoption_probs >= 0.5, 1, 0)
+adoption_probs <- predict(boosted_tree, newdata = animal_shelter_data, type = "response")
+animal_shelter_data$predicted <- ifelse(adoption_probs >= 0.5, 1, 0)
 ```
 
 ```{r}
@@ -205,24 +215,60 @@ classification_error
 ## 5. Principal Components Analysis
 
 ### Part C
+
 ```{r}
 pca <- prcomp(diabetes_data[, c(1:8)], scale = TRUE)
 pca
 ```
 
 ### Part D
+
 ```{r}
 sort(abs(pca[2]$rotation[, 1]), decreasing = TRUE)
 ```
 
 ### Part E
+
 ```{r}
 autoplot(
   pca,
-  data=diabetes_data,
-  loadings=TRUE,
-  loadings.label=TRUE,
-  color=ifelse(diabetes_data$outcome == 0, "red", "green")
+  data = diabetes_data,
+  loadings = TRUE,
+  loadings.label = TRUE,
+  color = ifelse(diabetes_data$outcome == 0, "red", "green")
 )
 ```
 
+### Part I
+
+```{r}
+pve <- (pca$sdev^2) / sum(pca$sdev^2)
+par(mfrow = c(1, 2))
+plot(pve, ylim = c(0, 1), xlab = "Principal Component", ylab = "% of variance explained")
+plot(cumsum(pve), ylim = c(0, 1), xlab = "Principal Component", ylab = "Sum % of explained variance")
+```
+
+### Part J (outcome=f(skin_thickness, insulin, BMI))
+
+```{r}
+reg <-
+  glm(
+    formula = outcome ~ skin_thickness + insulin + BMI,
+    data = diabetes_data,
+    family = "binomial"
+  )
+summary(reg)
+stargazer(
+  reg,
+  title = "Logistic Regression Results",
+  type = "html",
+  align = TRUE,
+  digits = 2,
+  dep.var.labels = c("Outcome"),
+  covariate.labels = c(
+    "Skin Thickness",
+    "Insulin",
+    "BMI"
+  )
+)
+```
