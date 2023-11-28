@@ -272,3 +272,18 @@ stargazer(
   )
 )
 ```
+
+### Part K
+
+```{r}
+predicted_probabilities <- predict(reg, type = "response")
+
+predicted_classes <- ifelse(predicted_probabilities > 0.5, 1, 0)
+
+actual_classes <- diabetes_data$outcome
+incorrect_predictions <- sum(predicted_classes != actual_classes)
+total_predictions <- length(predicted_classes)
+error_rate <- incorrect_predictions / total_predictions
+
+print(error_rate)
+```
